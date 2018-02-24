@@ -2,49 +2,68 @@
 <html>
 <head>
   <title>The CSE Automatic Screenshot Tool</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.3.1/ace.js" type="text/javascript" charset="utf-8"></script>
+  <script src="rainbow.min.js"></script>
+  <script src="rainbow.linenumbers.js"></script>
+  <link href="github.css" rel="stylesheet" type="text/css">
+  <link href="theme.css" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
 
   <style>
-    .editor {
-      position: relative;
-      padding-top: 30px;
+    * {
+      padding: 0;
+      margin: 0;
+      -webkit-print-color-adjust: exact;
     }
-    #filepicker {
-      height: 50px;
+    #title {
+      background-color: #008791;
+      color: white;
+      font-family: "Open Sans";
+      width: 100%;
+      padding: 10px;
+    }
+    #container {
+      padding: 5px;
+    }
+    #container h2 {
+      font-family: "Open Sans";
     }
   </style>
 </head>
 <body>
-    <input type="file" id="filepicker" name="fileList" webkitdirectory multiple /><span>upload your code below and download the screenshot by printing the page as a pdf</span>
-    <div id="container"></div>
+  <div id="title">
+    <input type="file" id="filepicker" name="fileList" webkitdirectory multiple />
+    <span style="font-size: 10pt;">upload your code below and download the screenshot by printing the page as a pdf</span>
+  </div>
+  <div id="container"></div>
 
     <script type="text/javascript">
-    let container = document.getElementById('container');
-
     document.getElementById('filepicker').addEventListener('change', function(event) {
       let files = event.target.files;
 
       for (let i=0; i<files.length; i++) {
         let path = files[i].webkitRelativePath;
         if (path.indexOf('.pyc') < 0 && path.indexOf('.git') < 0) {
+          /* test for language */
+          let lang = 'python';
+          if (path.indexOf('.html') >= 0) lang = 'html';
+          else if (path.indexOf('.js') >= 0) lang = 'javascript';
+
           console.log(path);
           let reader = new FileReader();
           reader.onload = function(e) {
-            let html_str = '<div id="editor'+path+'" class="editor"></div>';
-            container.innerHTML += html_str;
-            let editor = ace.edit('editor'+path);
-            editor.setTheme("ace/theme/xcode");
-            editor.getSession().setMode("ace/mode/python");
-            editor.setOptions({
-              maxLines: Infinity
+            let container = document.getElementById('container');
+            let code = reader.result;
+            let div = document.createElement('div');
+            div.innerHTML = '<pre><code data-language="'+lang+'">'+code+'</code></pre>';
+            Rainbow.color(div, function() {
+              div.innerHTML = '<h2>'+path+'</h2>'+div.innerHTML;
+              document.getElementById('container').appendChild(div);
             });
-            editor.insert(reader.result);
           }
           reader.readAsText(files[i]);
         }
       };
     }, false);
-
   </script>
 </body>
 </html>
