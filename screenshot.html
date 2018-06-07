@@ -26,38 +26,48 @@
     }
     #container h2 {
       font-family: "Open Sans";
+      font-weight: 100;
+    }
+    input[type="text"] {
+      background-color: rgba(0,0,0,0);
+      border: none;
+      width: 600px;
+      color: white;
     }
   </style>
 </head>
 <body>
   <div id="title">
-    <input type="file" id="filepicker" name="fileList" webkitdirectory multiple />
-    <span style="font-size: 10pt;">upload your code below and download the screenshot by printing the page as a pdf</span>
+    <input type="file" id="filepicker" name="fileList" style="width: 200px;"
+           webkitdirectory multiple />
+    <input type="text" style="font-size: 10pt;" value="upload your code below and download the screenshot by printing the page as a pdf"></input>
   </div>
   <div id="container"></div>
 
     <script type="text/javascript">
-    document.getElementById('filepicker').addEventListener('change', function(event) {
+    document.getElementById("filepicker").addEventListener("change", event => {
       let files = event.target.files;
 
       for (let i=0; i<files.length; i++) {
         let path = files[i].webkitRelativePath;
-        if (path.indexOf('.pyc') < 0 && path.indexOf('.git') < 0) {
+        if (path.indexOf(".pyc") < 0 && path.indexOf(".git") < 0) {
           /* test for language */
-          let lang = 'python';
-          if (path.indexOf('.html') >= 0) lang = 'html';
-          else if (path.indexOf('.js') >= 0) lang = 'javascript';
+          let lang = "python";
+          if (path.indexOf(".html") >= 0) lang = "html";
+          else if (path.indexOf(".js") >= 0) lang = "javascript";
+          else if (path.indexOf(".css") >= 0) lang = "css";
 
           console.log(path);
           let reader = new FileReader();
           reader.onload = function(e) {
-            let container = document.getElementById('container');
+            let container = document.getElementById("container");
             let code = reader.result;
-            let div = document.createElement('div');
-            div.innerHTML = '<pre><code data-language="'+lang+'">'+code+'</code></pre>';
-            Rainbow.color(div, function() {
-              div.innerHTML = '<h2>'+path+'</h2>'+div.innerHTML;
-              document.getElementById('container').appendChild(div);
+            let div = document.createElement("div");
+            div.innerHTML = `<pre><code
+              data-language="${lang}">${code}</code></pre>`
+            Rainbow.color(div, () => {
+              div.innerHTML = `<h2>${path}</h2>`+div.innerHTML;
+              document.getElementById("container").appendChild(div);
             });
           }
           reader.readAsText(files[i]);
